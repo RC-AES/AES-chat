@@ -724,8 +724,8 @@ const APP_VERSION = "1.2";
 // finns; själva nya filen får hämtas från Claude (eller varhelst du
 // väljer att lagra dina versioner).
 // Fyll i dessa när du satt upp GitHub Pages (se instruktionerna du fick).
-const GITHUB_USER = "DITT_ANVANDARNAMN";
-const GITHUB_REPO = "aes-chat";
+const GITHUB_USER = "RC-AES";
+const GITHUB_REPO = "AES-chat";
 const GITHUB_BRANCH = "main";
 const VERSION_JSON_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/version.json`;
 
@@ -735,7 +735,11 @@ const VERSION_JSON_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GIT
 async function checkForUpdate(){
   if(GITHUB_USER === "DITT_ANVANDARNAMN") return; // inte konfigurerat än
   try{
-    const res = await fetch(VERSION_JSON_URL, { cache: "no-store" });
+    let res = await fetch(VERSION_JSON_URL, { cache: "no-store" });
+    if(!res.ok && GITHUB_BRANCH === "main"){
+      // Äldre repon skapade före 2020 kan ha "master" som huvudgren
+      res = await fetch(VERSION_JSON_URL.replace("/main/", "/master/"), { cache: "no-store" });
+    }
     if(!res.ok) return;
     const data = await res.json();
     if(!data || !data.latest_version) return;
